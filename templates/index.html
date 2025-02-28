@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Enhancer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet"> <!-- إضافة خط Open Sans من Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: 'Open Sans', Arial, sans-serif; /* تغيير الخط إلى Open Sans مع خطوط احتياطية */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #f06, #4a90e2);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 1rem;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-family: 'Open Sans', Arial, sans-serif; /* تطبيق الخط على العنوان */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        header h1 .icon {
+            font-size: 2.5rem;
+            margin-left: 0.5rem;
+        }
+        main {
+            padding: 2rem;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+        .upload-section, .result-section {
+            margin: 2rem 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .upload-section input[type="file"], .upload-section button, .download-button {
+            margin-top: 1rem;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Open Sans', Arial, sans-serif; /* تطبيق الخط على الأزرار */
+        }
+        .upload-section input[type="file"] {
+            background-color: #89ceeb;
+            color: #242424;
+        }
+        .upload-section button {
+            background-color: #89ceeb;
+            color: rgb(48, 48, 48);
+            transition: background-color 0.3s;
+        }
+        .upload-section button:hover {
+            background-color: #0056b3;
+        }
+        .download-button {
+            background-color: #fcfcfc;
+            color: rgb(39, 37, 37);
+            transition: background-color 0.3s;
+            display: block;
+            margin: 1rem auto;
+        }
+        .download-button:hover {
+            background-color: #f6f6f6;
+        }
+        .upload-section img, .result-section img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .result-section img {
+            border: 3px solid #fff;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar div {
+            height: 20px;
+            background-color: #007BFF;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .alert {
+            display: none;
+            padding: 1rem;
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            margin-top: 1rem;
+            font-family: 'Open Sans', Arial, sans-serif; /* تطبيق الخط على التنبيهات */
+        }
+        .social-links {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+        .social-links a {
+            color: #333;
+            text-decoration: none;
+            font-size: 1.5rem;
+            transition: transform 0.3s, color 0.3s;
+            font-family: 'Open Sans', Arial, sans-serif; /* تطبيق الخط على روابط المشاركة (إن وجدت نصوص) */
+        }
+        .social-links a:hover {
+            transform: scale(1.2);
+            color: #007BFF;
+        }
+        .social-links a i {
+            display: block; /* ضمان ظهور الإيقونات دائمًا */
+        }
+        .language-switch {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+        }
+        .language-switch button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Open Sans', Arial, sans-serif; /* تطبيق الخط على أزرار اللغة */
+        }
+        .language-switch button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Enhance Your Images with AI <span class="icon">✨</span></h1>
+        <div class="language-switch">
+            <button onclick="switchLanguage('en')">English</button> |
+            <button onclick="switchLanguage('ar')">العربية</button>
+        </div>
+    </header>
+    <main>
+        <div class="upload-section">
+            <h2 id="upload-title">Upload a Low-Resolution Image</h2>
+            <input type="file" id="imageUpload" accept="image/*">
+            <button onclick="enhanceImage()" id="enhance-button">Enhance Quality</button>
+            <div class="progress-bar">
+                <div id="progress"></div>
+            </div>
+            <div class="alert" id="alert">Processing image...</div>
+        </div>
+        <div class="result-section">
+            <h2 id="result-title">Enhanced Image</h2>
+            <img id="resultImage" style="display:none;">
+            <a id="downloadLink" class="download-button" style="display:none;" download="enhanced_image.jpg">Download Enhanced Image</a>
+        </div>
+    </main>
+    <div class="social-links">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://yourwebsite.com/enhanced_image.jpg" target="_blank" id="share-facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://twitter.com/intent/tweet?url=https://yourwebsite.com/enhanced_image.jpg" target="_blank" id="share-twitter"><i class="fab fa-twitter"></i></a>
+        <a href="https://www.instagram.com/share?url=https://yourwebsite.com/enhanced_image.jpg" target="_blank" id="share-instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://x.com/intent/tweet?url=https://yourwebsite.com/enhanced_image.jpg" target="_blank" id="share-x"><i class="fab fa-x-twitter"></i></a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://yourwebsite.com/enhanced_image.jpg" target="_blank" id="share-linkedin"><i class="fab fa-linkedin-in"></i></a>
+    </div>
+    <script>
+        const imageUpload = document.getElementById('imageUpload');
+        const resultImage = document.getElementById('resultImage');
+        const progress = document.getElementById('progress');
+        const alertBox = document.getElementById('alert');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let currentLanguage = 'en';
+        const translations = {
+            'en': {
+                'upload-title': 'Upload a Low-Resolution Image',
+                'enhance-button': 'Enhance Quality',
+                'result-title': 'Enhanced Image'
+            },
+            'ar': {
+                'upload-title': 'تحميل صورة بدقة منخفضة',
+                'enhance-button': 'تحسين الجودة',
+                'result-title': 'الصورة المحسنة'
+            }
+        };
+
+        function switchLanguage(lang) {
+            currentLanguage = lang;
+            document.getElementById('upload-title').textContent = translations[lang]['upload-title'];
+            document.getElementById('enhance-button').textContent = translations[lang]['enhance-button'];
+            document.getElementById('result-title').textContent = translations[lang]['result-title'];
+            // إزالة أي نصوص قد تكون موجودة في أزرار المشاركة لضمان بقاء الإيقونات فقط
+            const socialLinks = document.querySelectorAll('.social-links a');
+            socialLinks.forEach(link => {
+                link.textContent = ''; // حذف أي نصوص (لكن الإيقونات ستظل موجودة بفضل CSS)
+            });
+        }
+
+        async function enhanceImage() {
+            const file = imageUpload.files[0];
+            if (!file) {
+                alert('Please select an image file first.');
+                return;
+            }
+
+            alertBox.style.display = 'block';
+            progress.style.width = '100%';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/enhance', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    resultImage.src = url;
+                    resultImage.style.display = 'block';
+                    downloadLink.href = url;
+                    downloadLink.style.display = 'inline-block';
+                } else {
+                    const error = await response.json();
+                    alert(`Error: ${error.error}`);
+                }
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            } finally {
+                alertBox.style.display = 'none';
+                progress.style.width = '0';
+            }
+        }
+    </script>
+</body>
+</html>
